@@ -3,106 +3,77 @@ import Layout from '../components/layout.astro';
 ---
 
 <style>
-.steps {
-  background: var(--light);
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: min(90vw, 250px);
-  justify-content: center;
-  margin-top: 3rem;
-  padding: 5rem 5vw;
-  width: 100vw;
-}
-
-@media (min-width: 550px) {
-  .steps {
-    grid-template-columns: repeat(2, min(calc(50% - 1rem), 250px));
-  }
-}
-
-@media (min-width: 1050px) {
-  .steps {
-    grid-template-columns: repeat(4, min(calc(25% - 1.5rem), 250px));
-  }
-}
-
-.step {
-  background: var(--white);
-  border: 1px solid var(--lightBorder);
-  border-radius: var(--card-radius);
+.form {
   display: flex;
   flex-direction: column;
-  font-size: 0.75rem;
-  padding: 1rem 1.5rem 1.5rem;
-  text-align: left;
-  box-shadow: 0 2px 4px rgb(14 30 37 / 12%);
+  margin: 0 auto;
+  width: 35ch;
 }
 
-.stepHeading {
-  font-size: 1rem;
+.form label {
+  color: var(--heading);
+  font-size: 0.625rem;
   font-weight: 600;
-  margin: 0;
+  letter-spacing: 0.2em;
+  margin-top: 1rem;
+  text-transform: uppercase;
+}
+
+.form label:first-of-type {
+  margin-top: 0;
+}
+
+.form input,
+.form textarea {
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.form textarea {
+  height: 100px;
+}
+
+.button {
+  margin-top:1rem;
+  border:none;
 }
 
 
+.heading,
+.docs {
+  text-align: center;
+}
 </style>
 
 <Layout
-  title="Netlify Feature Tour"
-  description="This is a small site to show the most powerful features of Netlify quickly!"
+  title="Home"
+  description="Ok."
   home
 >
-  <main class="steps">
-    <section class="step">
-      <h2 class="stepHeading">Deploy Previews</h2>
-      <p>
-        Every pull request is automatically built in an
-        identical-to-production environment for
-        <strong>painless QA, feedback, and review.</strong>
-      </p>
-      <a href="/deploy-previews" class="button">
-        Learn more <span class="sr-only">about Deploy Previews</span>
-      </a>
-    </section>
+  <main>
+    <h2 class="heading">Make this form functional</h2>
 
-    <section class="step">
-      <h2 class="stepHeading">Instant Rollbacks</h2>
-      <p>
-        Confidently ship to production with the knowledge that it’s a
-        one-click operation to roll back to a previous version of the site.
-        <strong>Instant disaster recovery!</strong>
-      </p>
-      <a href="/instant-rollbacks" class="button">
-        Learn more
-        <span class="sr-only">about Instant Rollbacks</span>
-      </a>
-    </section>
+    <form
+      class="form"
+      method="POST"
+      name="contact"
+      action="/success"
+    >
+      <label htmlFor="name">Name</label>
+      <input type="text" id="name" name="name" />
 
-    <section class="step">
-      <h2 class="stepHeading">Netlify Functions</h2>
-      <p>
-        <strong>Serverless functions are superpowers for web developers!</strong>
-        Securely handle server-like requirements at any scale with no
-        provisioning, scaling, or ops overhead.
-      </p>
-      <a href="/functions" class="button">
-      Learn more
-      <span class="sr-only">about Netlify Functions</span>
-      </a>
-    </section>
+      <label htmlFor="email">Email</label>
+      <input type="email" id="email" name="email" />
 
-    <section class="step">
-      <h2 class="stepHeading">Netlify Forms</h2>
-      <p>
-        Handle user input with a single line of code. Netlify Forms allow
-        any HTML form to
-        <strong>
-            accept submissions, send notification emails, and trigger custom events.
-        </strong>
-      </p>
-      <a href="/netlify-forms" class="button">
-        Learn more <span class="sr-only">about Netlify Forms</span>
-      </a>
-    </section>
+      <label htmlFor="message">Message</label>
+      <textarea name="message"></textarea>
+
+      <button type="submit" class="button">
+        Send
+      </button>
+    </form>
   </main>
 </Layout>
