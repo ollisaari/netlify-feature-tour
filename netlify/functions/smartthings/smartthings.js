@@ -1,6 +1,13 @@
 const axios = require('axios');
 const sleep = require('sleep-promise');
 
+const HEADERS = {
+    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+    'Content-Type': 'application/json', //optional
+    'Access-Control-Allow-Origin': '*',
+    'Vary': 'Origin'
+}
+
 // Replace YOUR_SMARTTHINGS_API_TOKEN with your actual SmartThings API Token
 const API_TOKEN = '0b0e47b9-5a7e-4c13-8b08-af2295a7ec00';
 
@@ -21,6 +28,7 @@ exports.handler = async (event, context) => {
         return {
             statusCode: 403,
             body: 'Access denied: Invalid API key',
+            HEADERS
         };
     }
 
@@ -30,7 +38,8 @@ exports.handler = async (event, context) => {
     if (!desiredTemperature || isNaN(desiredTemperature)) {
         return {
             statusCode: 400,
-            body: JSON.stringify('Invalid temperature provided.')
+            body: JSON.stringify('Invalid temperature provided.'),
+            HEADERS
         };
     }
 
@@ -77,7 +86,8 @@ exports.handler = async (event, context) => {
             if (currentTemperature === desiredTemperature) {
                 return {
                     statusCode: 200,
-                    body: JSON.stringify(`Temperature is already set to ${desiredTemperature} degrees.`)
+                    body: JSON.stringify(`Temperature is already set to ${desiredTemperature} degrees.`),
+                    HEADERS
                 };
             }
             
@@ -105,25 +115,24 @@ exports.handler = async (event, context) => {
 
             return {
                 statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Headers": "Content-Type"
-                },
-                body: JSON.stringify(`Temperature set to ${desiredTemperature} degrees (ero: ${difference}).`)
+                body: JSON.stringify(`Temperature set to ${desiredTemperature} degrees (ero: ${difference}).`),
+                HEADERS
             };
 
         } catch (error) {
             console.error(error);
             return {
                 statusCode: 500,
-                body: JSON.stringify('An error occurred.')
+                body: JSON.stringify('An error occurred.'),
+                HEADERS
             };
         }
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
-            body: JSON.stringify('An error occurred.')
+            body: JSON.stringify('An error occurred.'),
+            HEADERS
         };
     }
 }    
