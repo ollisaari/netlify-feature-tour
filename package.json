@@ -8,9 +8,15 @@
     "build": "astro build",
     "preview": "astro preview"
   },
+  "dependencies": {
+    "axios": "^1.5.1",
+    "netlify-lambda": "^2.0.16",
+    "sleep-promise": "^9.1.0"
+  },
   "devDependencies": {
     "@astrojs/preact": "^1.0.2",
     "@astrojs/sitemap": "^1.0.0",
-    "astro": "^2.0.0"
+    "astro": "^2.0.0",
+    "netlify-cli": "^16.5.1"
   }
 }
