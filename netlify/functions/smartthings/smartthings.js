@@ -1,125 +1,58 @@
-const axios = require('axios');
-const sleep = require('sleep-promise');
-
-// Replace YOUR_SMARTTHINGS_API_TOKEN with your actual SmartThings API Token
-const API_TOKEN = '0b0e47b9-5a7e-4c13-8b08-af2295a7ec00';
-
-// Replace YOUR_DEVICE_ID with the actual Device ID of your air heat pump
-const DEVICE_ID = '3c8de04d-a703-c8c6-8705-185c9372317d';
-
-const headers = {
-    'Authorization': `Bearer ${API_TOKEN}`,
-    'Content-Type': 'application/json'
-};
-
-const apiUrl = `https://api.smartthings.com/v1/devices/${DEVICE_ID}`;
+/* eslint-disable n/exports-style */
+const setTemperature = require('./api/set-temperature');
+const getRoomTemperature = require('./api/get-room-temperature');
+const getDeviceStatus = require('./api/get-device-status');
+const switchOnOff = require('./api/switch-on-off');
 
 exports.handler = async (event, context) => {
-    const apiKey = event.headers['x-api-key'];
 
-    if (!apiKey || apiKey !== process.env.SECRET_API_KEY) {
-        return {
-            statusCode: 403,
-            body: 'Access denied: Invalid API key',
-        };
-    }
+    // const apiKey = event.headers['x-api-key'];
 
-    // Get the desired temperature from query parameters
-    const desiredTemperature = event.queryStringParameters.temperature;
+    // if (!apiKey || apiKey !== process.env.SECRET_API_KEY) {
+    //     return {
+    //         statusCode: 401,
+    //         body: 'Access denied: Invalid API key',
+    //     };
+    // }
 
-    if (!desiredTemperature || isNaN(desiredTemperature)) {
+    const command = event.queryStringParameters.command || null;
+
+    if ( ! command ) {
         return {
             statusCode: 400,
-            body: JSON.stringify('Invalid temperature provided.')
+            body: JSON.stringify('No command provided.')
         };
     }
 
-    try {
-        // Set device to default mode (heating)
-        await axios.post(`${apiUrl}/commands`, {
-            "commands": [
-                {
-                    "component": "main",
-                    "capability": "switch",
-                    "command": "on"
-                },
-                {
-                    "component": "main",
-                    "capability": "airConditionerMode",
-                    "command": "setAirConditionerMode",
-                    "arguments": [
-                        "heat"
-                    ]
-                },
-                {
-                    "component": "main",
-                    "capability": "custom.airConditionerOptionalMode",
-                    "command": "setAcOptionalMode",
-                    "arguments": [
-                        "off"
-                    ]
-                }
-            ]
-        }, {
-            headers: headers
-        });
+    switch ( command ) {
+        case 'setTemperature':
 
-        try {
-            // Fetch device status
-            const status = await axios.get(`${apiUrl}/status`, {
-                headers: headers
-            });
+            return await setTemperature( event.queryStringParameters.temperature );
 
-            // Current set target temperature
-            const currentTemperature = status.data.components.main.thermostatCoolingSetpoint.coolingSetpoint.value;
-            
-            // If the current temperature is the same as the desired temperature, return
-            if (currentTemperature === desiredTemperature) {
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify(`Temperature is already set to ${desiredTemperature} degrees.`)
-                };
-            }
-            
-            // Calculate the difference between the current temperature and the desired temperature
-            const difference = desiredTemperature - currentTemperature;
+        case 'getRoomTemperature':
 
-            // Initialize command to raise or lower the temperature
-            const command = difference > 0 ? "raiseSetpoint" : "lowerSetpoint";
+            return await getRoomTemperature();
 
-            // Make API calls to adjust temperature, one call per degree
-            for (let i = 0; i < Math.abs(difference); i++) {
-                await axios.post(`${apiUrl}/commands`, {
-                    "commands": [
-                        {
-                            "component": "main",
-                            "capability": "custom.thermostatSetpointControl",
-                            "command": command
-                        }
-                    ]
-                }, {
-                    headers: headers
-                });
-                await sleep( 500 );
-            }
+        case 'getDeviceStatus':
 
+            return await getDeviceStatus();
+
+        case 'switch_on':
+
+            return await switchOnOff( 'on' );
+
+        case 'switch_off':
+
+            return await switchOnOff( 'on' );
+
+        case 'switch':
+
+            return await switchOnOff( event.queryStringParameters.mode );
+
+        default:
             return {
-                statusCode: 200,
-                body: JSON.stringify(`Temperature set to ${desiredTemperature} degrees (ero: ${difference}).`)
+                statusCode: 400,
+                body: JSON.stringify('Invalid command provided.')
             };
-
-        } catch (error) {
-            console.error(error);
-            return {
-                statusCode: 500,
-                body: JSON.stringify('An error occurred.')
-            };
-        }
-    } catch (error) {
-        console.error(error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify('An error occurred.')
-        };
     }
-}    
+}
