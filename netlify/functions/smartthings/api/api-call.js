@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 /**
- * Makes an API call to a specified endpoint with a specified HTTP method.
+ * Makes an API call to the SmartThings API.
  *
  * @param {string} method - The HTTP method to use ('GET', 'POST', etc.)
  * @param {string} endpoint - The API endpoint to call

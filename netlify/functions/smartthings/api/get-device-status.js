@@ -3,8 +3,10 @@ const errorHandling = require('./api-error-handling');
 
 /**
  * Get the current status of the device.
+ *
+ * @param {object} Netlify event
  */
-module.exports = async function getDeviceStatus() {
+module.exports = async function getDeviceStatus( event ) {
     try {
         const status = await makeApiCall( 'GET', `status` );
         return {

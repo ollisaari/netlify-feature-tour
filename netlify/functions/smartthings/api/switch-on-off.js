@@ -3,7 +3,14 @@ const errorHandling = require('./api-error-handling');
 const command = require('./api-command');
 
 
-module.exports = async function switchOnOff( mode ) {
+module.exports = async function switchOnOff( event ) {
+
+    const mode = event.queryStringParameters.mode ?? null;
+
+    if ( ! mode ) {
+        return errorHandling( 400, 'No mode provided for switch.' );
+    }
+
     try {
         const request = makeApiCall( 'POST', `commands`, [
             command( 'switch', { mode } )

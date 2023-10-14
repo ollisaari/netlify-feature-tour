@@ -7,9 +7,11 @@ const errorHandling = require('./api-error-handling');
 /**
  * Set the desired temperature for the room.
  *
- * @param {number} desiredTemperature
+ * @param {object} Netlify event
  */
-module.exports = async function setTemperature( desiredTemperature ) {
+module.exports = async function setTemperature( event ) {
+
+    const desiredTemperature = event.queryStringParameters.temperature;
 
     if (!desiredTemperature || isNaN(desiredTemperature)) {
         return errorHandling( 400, 'Invalid temperature provided.' );
