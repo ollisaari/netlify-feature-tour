@@ -21,3 +21,6 @@ _old/
 
 # Local Netlify folder
 .netlify
+
+# ESLint cache
+.eslintcache
