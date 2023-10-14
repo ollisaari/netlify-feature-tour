@@ -1,5 +1,6 @@
 const errorHandling = require('./api-error-handling');
 const getDeviceStatus = require('./get-device-status');
+const axios = require('axios');
 
 /**
  * Get the current status of the device.
@@ -15,10 +16,18 @@ module.exports = async function getRoomTemperature( event ) {
         // Current temperature in the room
         const currentTemperature = status.body.components.main.temperatureMeasurement.temperature.value;
 
+        const returnBody = {
+            temperature : currentTemperature
+        };
+
         if ( event.queryStringParameters.ifttt && parseInt( event.queryStringParameters.ifttt ) === 1 ) {
+
+            const protocol = event.headers.host.includes( 'localhost' ) ? 'http' : 'https';
+            const baseUrl = protocol + '://' + event.headers.host;
+
             const config = {
-                method: 'get',
-                url: `./functions/ifttt-webhook/?event=temperature&value1=${process.env.AIR_HEAT_PUMP_DEVICE_ID}&value2=${currentTemperature}`,
+                method: 'post',
+                url: `${baseUrl}/.netlify/functions/ifttt-webhook/?event=temperature&value1=${process.env.AIR_HEAT_PUMP_DEVICE_ID}&value2=${currentTemperature}`,
                 headers: {
                     'x-api-key': process.env.SECRET_API_KEY,
                     'Content-Type': 'application/json'
@@ -26,15 +35,14 @@ module.exports = async function getRoomTemperature( event ) {
             };
 
             // Perform the API call and return the Axios promise
-            return axios(config);
+            const ifttt = await axios(config);
+
+            returnBody.ifttt = ifttt.data;
         }
 
         return {
             statusCode: 200,
-            body: JSON.stringify({
-                temperature: currentTemperature,
-                iftttWebookUrl: config.url ?? ''
-            })
+            body: JSON.stringify(returnBody)
         };
 
     } catch( e ) {
